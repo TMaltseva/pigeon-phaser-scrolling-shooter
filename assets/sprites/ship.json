@@ -1,0 +1,39 @@
+{
+    "frames": {
+      "ship_0": {
+        "frame": { "x": 0, "y": 0, "w": 250, "h": 250 },
+        "rotated": false,
+        "trimmed": false,
+        "spriteSourceSize": { "x": 0, "y": 0, "w": 250, "h": 250 },
+        "sourceSize": { "w": 250, "h": 250 }
+      },
+      "ship_1": {
+        "frame": { "x": 260, "y": 0, "w": 250, "h": 250 },
+        "rotated": false,
+        "trimmed": false,
+        "spriteSourceSize": { "x": 0, "y": 0, "w": 250, "h": 250 },
+        "sourceSize": { "w": 250, "h": 250 }
+      },
+      "ship_2": {
+        "frame": { "x": 0, "y": 250, "w": 240, "h": 250 },
+        "rotated": false,
+        "trimmed": false,
+        "spriteSourceSize": { "x": 0, "y": 0, "w": 250, "h": 250 },
+        "sourceSize": { "w": 250, "h": 250 }
+      },
+      "ship_3": {
+        "frame": { "x": 250, "y": 250, "w": 240, "h": 250 },
+        "rotated": false,
+        "trimmed": false,
+        "spriteSourceSize": { "x": 0, "y": 0, "w": 250, "h": 250 },
+        "sourceSize": { "w": 250, "h": 250 }
+      }
+    },
+    "meta": {
+      "app": "https://www.codeandweb.com/texturepacker",
+      "image": "ship.png",
+      "format": "RGBA8888",
+      "size": { "w": 500, "h": 500 },
+      "scale": "1"
+    }
+  }
