@@ -10,6 +10,9 @@ class Player extends Phaser.GameObjects.Sprite {
     this.setScale(0.8);
     this.body.enable = true;
     this.velocity = 500;
+
+    this.fires = new Fires(this.scene);
+    this.fires.createFire(this);
   }
 
   move() {
