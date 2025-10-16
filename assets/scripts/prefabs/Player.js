@@ -7,6 +7,7 @@ class Player extends Phaser.GameObjects.Sprite {
   init() {
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
+    this.setScale(0.8);
     this.body.enable = true;
     this.velocity = 500;
   }
