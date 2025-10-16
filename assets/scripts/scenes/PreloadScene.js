@@ -4,6 +4,7 @@ class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image("seeds", "assets/sprites/seeds.png");
     this.load.atlas(
       "bird",
       "assets/sprites/bird.png",
