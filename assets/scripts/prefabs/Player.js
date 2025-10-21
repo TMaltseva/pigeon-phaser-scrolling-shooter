@@ -1,17 +1,30 @@
-class Player extends Phaser.GameObjects.Sprite {
+class Player extends MovableObject {
   constructor(scene) {
-    super(scene, 150, config.height / 2, "bird", "bird_0");
-    this.init();
+    super({
+      scene,
+      x: 150,
+      y: config.height / 2,
+      texture: "bird",
+      frame: "bird_0",
+      velocity: 500,
+    });
+    this.initPlayer();
   }
 
-  init() {
-    this.scene.add.existing(this);
-    this.scene.physics.add.existing(this);
+  initPlayer() {
     this.setScale(0.8);
-    this.body.enable = true;
-    this.velocity = 500;
 
     this.fires = new Fires(this.scene);
+
+    this.timer = this.scene.time.addEvent({
+      delay: 500,
+      loop: true,
+      callback: this.fire,
+      callbackScope: this,
+    });
+  }
+
+  fire() {
     this.fires.createFire(this);
   }
 

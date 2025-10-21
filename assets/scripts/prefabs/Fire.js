@@ -1,29 +1,16 @@
-class Fire extends Phaser.GameObjects.Sprite {
-  constructor(data) {
-    super(data.scene, data.x, data.y, data.texture);
-    this.init(data);
-  }
-
-  init(data) {
-    this.scene.add.existing(this);
-    this.velocity = data.velocity;
-    this.setScale(0.5);
-  }
-
+class Fire extends MovableObject {
   static generate(scene, source) {
     const data = {
       scene,
       x: source.x + source.width / 2,
       y: source.y,
       texture: "seeds",
-      velocity: 750,
+      velocity: 300,
     };
     return new Fire(data);
   }
 
-  move() {
-    this.body.setVelocityX(this.velocity);
+  isDead() {
+    return this.x < -this.width || this.x > config.width + this.width;
   }
-
-  reset() {}
 }
