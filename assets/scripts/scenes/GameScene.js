@@ -61,9 +61,12 @@ class GameScene extends Phaser.Scene {
   }
 
   onOverlap(source, target) {
-    if (source != this.player && target != this.player) {
+    const enemy = [source, target].find((item) => item.texture.key === "ship");
+
+    if (enemy) {
       ++this.score;
       this.scoreText.setText(`Score: ${this.score}`);
+      Boom.generate(this, enemy.x, enemy.y);
     }
     source.setAlive(false);
     target.setAlive(false);
