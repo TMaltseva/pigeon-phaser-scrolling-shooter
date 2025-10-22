@@ -60,17 +60,19 @@ class Player extends MovableObject {
 
   move() {
     this.body.setVelocity(0);
+    if (this.scene.joystick) {
+    } else {
+      if (this.scene.cursors.left.isDown) {
+        this.body.setVelocityX(-this.velocity);
+      } else if (this.scene.cursors.right.isDown) {
+        this.body.setVelocityX(this.velocity);
+      }
 
-    if (this.scene.cursors.left.isDown) {
-      this.body.setVelocityX(-this.velocity);
-    } else if (this.scene.cursors.right.isDown) {
-      this.body.setVelocityX(this.velocity);
-    }
-
-    if (this.scene.cursors.up.isDown) {
-      this.body.setVelocityY(-this.velocity);
-    } else if (this.scene.cursors.down.isDown) {
-      this.body.setVelocityY(this.velocity);
+      if (this.scene.cursors.up.isDown) {
+        this.body.setVelocityY(-this.velocity);
+      } else if (this.scene.cursors.down.isDown) {
+        this.body.setVelocityY(this.velocity);
+      }
     }
 
     if (this.scene.cursors.space.isDown) {

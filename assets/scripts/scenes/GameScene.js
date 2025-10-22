@@ -6,6 +6,8 @@ class GameScene extends Phaser.Scene {
   init() {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.score = 0;
+    this.joystick = null;
+    this.isFiring = false;
   }
 
   create() {
@@ -19,17 +21,61 @@ class GameScene extends Phaser.Scene {
     this.createCompleteEvents();
     this.addOverlap();
     this.createText();
+
+    this.createVirtualJoystick();
+  }
+
+  createVirtualJoystick() {
+    if (!this.sys.game.device.input.touch) return;
+
+    const { width, height } = this.scale;
+
+    this.joystick = this.plugins.get("rexVirtualJoystick").add(this, {
+      x: 150,
+      y: height - 150,
+      radius: 80,
+      base: this.add.circle(0, 0, 80, 0x888888, 0.5),
+      thumb: this.add.circle(0, 0, 40, 0xcccccc, 0.8),
+      dir: "8dir",
+      forceMin: 16,
+    });
+
+    this.fireButton = this.add
+      .circle(width - 150, height - 150, 60, 0xffa000, 0.5)
+      .setInteractive()
+      .on("pointerdown", () => {
+        this.isFiring = true;
+        this.player.fire();
+        this.player.lastFired = this.time.now;
+      })
+      .on("pointerup", () => {
+        this.isFiring = false;
+      })
+      .on("pointerout", () => {
+        this.isFiring = false;
+      });
+
+    this.add.circle(width - 150, height - 150, 30, 0xffffff, 0.8);
+  }
+
+  handleJoystickInput() {
+    if (this.joystick && this.joystick.force > 0) {
+      const speedMultiplier = Math.min(this.joystick.force / 80, 1);
+      this.player.body.setVelocityX(
+        this.joystick.forceX * speedMultiplier * 10
+      );
+      this.player.body.setVelocityY(
+        this.joystick.forceY * speedMultiplier * 10
+      );
+    }
   }
 
   createSounds() {
-    console.log("Creating sounds...");
     this.sounds = {
       boom: this.sound.add("boom", { volume: 0.1 }),
       theme: this.sound.add("theme", { volume: 0.2, loop: true }),
     };
-    console.log("Sounds created:", this.sounds);
     this.sounds.theme.play();
-    console.log("Theme play called");
   }
 
   createText() {
@@ -91,6 +137,15 @@ class GameScene extends Phaser.Scene {
   update() {
     this.player.move();
     this.bg.tilePositionX += 0.5;
+    this.handleJoystickInput();
+
+    if (this.isFiring) {
+      const time = this.time.now;
+      if (time > this.player.lastFired + this.player.fireDelay) {
+        this.player.fire();
+        this.player.lastFired = time;
+      }
+    }
   }
 
   createBackground() {
