@@ -12,6 +12,6 @@ class Fire extends MovableObject {
   }
 
   isDead() {
-    return this.x < -this.width || this.x > config.width + this.width;
+    return this.x < -this.width || this.x > config.width + 50;
   }
 }

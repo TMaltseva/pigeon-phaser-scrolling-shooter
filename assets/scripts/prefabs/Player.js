@@ -10,12 +10,27 @@ class Player extends MovableObject {
       bullet: {
         delay: 500,
         texture: "seeds",
-        velocity: 750,
+        velocity: 500,
       },
       origin: { x: 1, y: 0.5 },
     });
 
     this.initPlayer();
+
+    const frames = this.scene.anims.generateFrameNames("bird", {
+      prefix: "bird_",
+      start: 0,
+      end: 5,
+    });
+
+    this.scene.anims.create({
+      key: "fly",
+      frames,
+      frameRate: 5,
+      repeat: -1,
+    });
+
+    this.play("fly");
   }
 
   initPlayer() {
@@ -28,12 +43,15 @@ class Player extends MovableObject {
     this.setScale(0.8);
     this.fires = new Fires(this.scene);
 
-    this.timer = this.scene.time.addEvent({
-      delay: 500,
-      loop: true,
-      callback: this.fire,
-      callbackScope: this,
-    });
+    // this.timer = this.scene.time.addEvent({
+    //   delay: 1000,
+    //   loop: true,
+    //   callback: this.fire,
+    //   callbackScope: this,
+    // });
+
+    this.lastFired = 0;
+    this.fireDelay = 300;
   }
 
   fire() {
@@ -53,6 +71,15 @@ class Player extends MovableObject {
       this.body.setVelocityY(-this.velocity);
     } else if (this.scene.cursors.down.isDown) {
       this.body.setVelocityY(this.velocity);
+    }
+
+    if (this.scene.cursors.space.isDown) {
+      const time = this.scene.time.now;
+
+      if (time > this.lastFired + this.fireDelay) {
+        this.fire();
+        this.lastFired = time;
+      }
     }
   }
 }

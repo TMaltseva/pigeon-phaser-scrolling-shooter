@@ -26,6 +26,9 @@ class Enemies extends Phaser.Physics.Arcade.Group {
 
   onEnemyKilled() {
     ++this.countKilled;
+    console.log(
+      `Enemy killed! countKilled: ${this.countKilled}, countCreated: ${this.countCreated}`
+    );
 
     if (this.countKilled >= this.countMax) {
       console.log("enemies killed!");
