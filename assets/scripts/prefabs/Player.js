@@ -75,6 +75,8 @@ class Player extends MovableObject {
       }
     }
 
+    this.constrainToScreen();
+
     if (this.scene.cursors.space.isDown) {
       const time = this.scene.time.now;
 
@@ -82,6 +84,28 @@ class Player extends MovableObject {
         this.fire();
         this.lastFired = time;
       }
+    }
+  }
+
+  constrainToScreen() {
+    const bounds = this.getBounds();
+    const extraHeight = this.displayHeight / 2;
+
+    if (bounds.x < 0) {
+      this.x = this.displayWidth * this.originX;
+    }
+    if (bounds.x + bounds.width > this.scene.scale.width) {
+      this.x = this.scene.scale.width - this.displayWidth * (1 - this.originX);
+    }
+
+    if (bounds.y < -extraHeight) {
+      this.y = this.displayHeight * this.originY - extraHeight;
+    }
+    if (bounds.y + bounds.height > this.scene.scale.height + extraHeight) {
+      this.y =
+        this.scene.scale.height -
+        this.displayHeight * (1 - this.originY) +
+        extraHeight;
     }
   }
 }
