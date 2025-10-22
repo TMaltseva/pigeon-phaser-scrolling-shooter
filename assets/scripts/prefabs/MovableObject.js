@@ -10,6 +10,8 @@ class MovableObject extends Phaser.GameObjects.Sprite {
     this.body.enable = true;
     this.setScale(0.5);
     this.velocity = data.velocity;
+    this.bullet = data.bullet;
+    this.originConfig = data.origin;
     this.scene.events.on("update", this.update, this);
   }
 

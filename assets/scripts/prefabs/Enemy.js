@@ -1,4 +1,11 @@
 class Enemy extends MovableObject {
+  static generateAttributes() {
+    const x = config.width + 100;
+    const y = Phaser.Math.Between(100, config.height - 100);
+
+    return { x, y, frame: `ship_${Phaser.Math.Between(0, 3)}` };
+  }
+
   static generate(scene) {
     const data = Enemy.generateAttributes();
 
@@ -9,20 +16,40 @@ class Enemy extends MovableObject {
       texture: "ship",
       frame: data.frame,
       velocity: -200,
+      bullet: {
+        delay: 1000,
+        texture: "fire",
+        velocity: -500,
+      },
+      origin: { x: 0, y: 0.5 },
     });
   }
 
-  static generateAttributes() {
-    const x = config.width + 100;
-    const y = Phaser.Math.Between(100, config.height - 100);
+  init(data) {
+    super.init(data);
+    this.setOrigin(data.origin.x, data.origin.y);
+    this.fires = new Fires(this.scene);
 
-    return { x, y, frame: `ship_${Phaser.Math.Between(0, 3)}` };
+    this.timer = this.scene.time.addEvent({
+      delay: data.bullet.delay,
+      loop: true,
+      callback: this.fire,
+      callbackScope: this,
+    });
   }
 
   reset() {
     const data = Enemy.generateAttributes();
     super.reset(data.x, data.y);
     this.setFrame(data.frame);
+  }
+
+  fire() {
+    this.fires.createFire(this);
+  }
+
+  isDead() {
+    return this.x < -this.width;
   }
 
   //   update() {
@@ -36,8 +63,4 @@ class Enemy extends MovableObject {
   //       this.setAlive(false);
   //     }
   //   }
-
-  isDead() {
-    return this.x < -this.width;
-  }
 }

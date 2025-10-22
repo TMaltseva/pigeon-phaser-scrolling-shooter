@@ -7,13 +7,25 @@ class Player extends MovableObject {
       texture: "bird",
       frame: "bird_0",
       velocity: 500,
+      bullet: {
+        delay: 500,
+        texture: "seeds",
+        velocity: 750,
+      },
+      origin: { x: 1, y: 0.5 },
     });
+
     this.initPlayer();
   }
 
   initPlayer() {
-    this.setScale(0.8);
+    this.x += this.displayWidth / 2;
 
+    if (this.originConfig) {
+      this.setOrigin(this.originConfig.x, this.originConfig.y);
+    }
+
+    this.setScale(0.8);
     this.fires = new Fires(this.scene);
 
     this.timer = this.scene.time.addEvent({

@@ -2,11 +2,12 @@ class Fire extends MovableObject {
   static generate(scene, source) {
     const data = {
       scene,
-      x: source.x + source.width / 2,
+      x: source.x,
       y: source.y,
-      texture: "seeds",
-      velocity: 300,
+      texture: source.bullet.texture,
+      velocity: source.bullet.velocity,
     };
+
     return new Fire(data);
   }
 
