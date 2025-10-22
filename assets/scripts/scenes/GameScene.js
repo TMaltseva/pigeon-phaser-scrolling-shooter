@@ -10,11 +10,26 @@ class GameScene extends Phaser.Scene {
 
   create() {
     this.createBackground();
+
+    if (!this.sounds) {
+      this.createSounds();
+    }
     this.player = new Player(this);
     this.enemies = new Enemies(this);
     this.createCompleteEvents();
     this.addOverlap();
     this.createText();
+  }
+
+  createSounds() {
+    console.log("Creating sounds...");
+    this.sounds = {
+      boom: this.sound.add("boom", { volume: 0.1 }),
+      theme: this.sound.add("theme", { volume: 0.2, loop: true }),
+    };
+    console.log("Sounds created:", this.sounds);
+    this.sounds.theme.play();
+    console.log("Theme play called");
   }
 
   createText() {
@@ -67,6 +82,7 @@ class GameScene extends Phaser.Scene {
       ++this.score;
       this.scoreText.setText(`Score: ${this.score}`);
       Boom.generate(this, enemy.x, enemy.y);
+      this.sounds.boom.play();
     }
     source.setAlive(false);
     target.setAlive(false);

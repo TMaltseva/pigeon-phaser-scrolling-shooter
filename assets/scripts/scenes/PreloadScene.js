@@ -24,6 +24,9 @@ class PreloadScene extends Phaser.Scene {
       "assets/sprites/boom.png",
       "assets/sprites/boom.json"
     );
+
+    this.load.audio("theme", "assets/sounds/theme.mp3");
+    this.load.audio("boom", "assets/sounds/boom.mp3");
   }
 
   create() {
