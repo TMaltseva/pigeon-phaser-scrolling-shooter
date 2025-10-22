@@ -4,6 +4,13 @@ class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+    this.add.sprite(0, 0, "bg").setOrigin(0);
+
+    const loadingBar = new LoadingBar(this);
+    this.preloadAssets();
+  }
+
+  preloadAssets() {
     this.load.image("seeds", "assets/sprites/seeds.png");
     this.load.image("fire", "assets/sprites/fire.png");
 
