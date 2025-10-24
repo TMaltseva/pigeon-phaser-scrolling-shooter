@@ -35,7 +35,7 @@ class LoadingBar {
   }
 
   onFileProgress(file) {
-    console.log(file);
+    // console.log(file);
   }
 
   onLoadComplete() {
