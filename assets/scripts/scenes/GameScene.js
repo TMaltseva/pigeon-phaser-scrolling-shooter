@@ -6,8 +6,16 @@ class GameScene extends Phaser.Scene {
   init() {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.score = 0;
-    this.joystick = null;
     this.isFiring = false;
+    this.isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+    this.touchStartX = 0;
+    this.touchStartY = 0;
+    this.touchCurrentX = 0;
+    this.touchCurrentY = 0;
+    this.isTouching = false;
   }
 
   create() {
@@ -22,26 +30,36 @@ class GameScene extends Phaser.Scene {
     this.addOverlap();
     this.createText();
 
-    this.createVirtualJoystick();
+    if (this.isMobile) {
+      this.setupTouchControls();
+    }
   }
 
-  createVirtualJoystick() {
-    if (!this.sys.game.device.input.touch) return;
-
-    const { width, height } = this.scale;
-
-    this.joystick = this.plugins.get("rexVirtualJoystick").add(this, {
-      x: 150,
-      y: height - 150,
-      radius: 80,
-      base: this.add.circle(0, 0, 80, 0x888888, 0.5),
-      thumb: this.add.circle(0, 0, 40, 0xcccccc, 0.8),
-      dir: "8dir",
-      forceMin: 16,
+  setupTouchControls() {
+    this.input.on("pointerdown", (pointer) => {
+      this.isTouching = true;
+      this.touchStartX = pointer.x;
+      this.touchStartY = pointer.y;
+      this.touchCurrentX = pointer.x;
+      this.touchCurrentY = pointer.y;
     });
 
+    this.input.on("pointermove", (pointer) => {
+      if (this.isTouching) {
+        this.touchCurrentX = pointer.x;
+        this.touchCurrentY = pointer.y;
+      }
+    });
+
+    this.input.on("pointerup", (pointer) => {
+      this.isTouching = false;
+      this.touchCurrentX = pointer.x;
+      this.touchCurrentY = pointer.y;
+    });
+
+    const { width, height } = this.scale;
     this.fireButton = this.add
-      .circle(width - 150, height - 150, 60, 0xffa000, 0.5)
+      .circle(width - 80, height - 80, 50, 0xffa000, 0.7)
       .setInteractive()
       .on("pointerdown", () => {
         this.isFiring = true;
@@ -55,18 +73,22 @@ class GameScene extends Phaser.Scene {
         this.isFiring = false;
       });
 
-    this.add.circle(width - 150, height - 150, 30, 0xffffff, 0.8);
+    this.add.circle(width - 80, height - 80, 25, 0xffffff, 0.9);
   }
 
-  handleJoystickInput() {
-    if (this.joystick && this.joystick.force > 0) {
-      const speedMultiplier = Math.min(this.joystick.force / 80, 1);
-      this.player.body.setVelocityX(
-        this.joystick.forceX * speedMultiplier * 10
-      );
-      this.player.body.setVelocityY(
-        this.joystick.forceY * speedMultiplier * 10
-      );
+  handleTouchInput() {
+    if (this.isTouching && this.isMobile) {
+      const deltaX = this.touchCurrentX - this.touchStartX;
+      const deltaY = this.touchCurrentY - this.touchStartY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      if (distance > 10) {
+        const speed = Math.min(distance / 100, 1) * this.player.velocity;
+        const angle = Math.atan2(deltaY, deltaX);
+
+        this.player.body.setVelocityX(Math.cos(angle) * speed);
+        this.player.body.setVelocityY(Math.sin(angle) * speed);
+      }
     }
   }
 
@@ -136,8 +158,14 @@ class GameScene extends Phaser.Scene {
 
   update() {
     this.player.move();
-    this.bg.tilePositionX += 0.5;
-    this.handleJoystickInput();
+
+    if (!this.isMobile) {
+      this.bg.tilePositionX += 0.5;
+    }
+
+    if (this.isMobile) {
+      this.handleTouchInput();
+    }
 
     if (this.isFiring) {
       const time = this.time.now;
@@ -149,8 +177,23 @@ class GameScene extends Phaser.Scene {
   }
 
   createBackground() {
-    this.bg = this.add
-      .tileSprite(0, 0, config.width, config.height, "bg")
-      .setOrigin(0);
+    if (this.isMobile) {
+      this.bg = this.add.image(0, 0, "bgp").setOrigin(0);
+
+      const scaleX = this.scale.width / this.bg.width;
+      const scaleY = this.scale.height / this.bg.height;
+      const scale = Math.max(scaleX, scaleY);
+
+      this.bg.setScale(scale);
+
+      this.bg.setPosition(
+        (this.scale.width - this.bg.displayWidth) / 2,
+        (this.scale.height - this.bg.displayHeight) / 2
+      );
+    } else {
+      this.bg = this.add
+        .tileSprite(0, 0, config.width, config.height, "bg")
+        .setOrigin(0);
+    }
   }
 }
