@@ -16,6 +16,7 @@ class GameScene extends Phaser.Scene {
     this.touchCurrentX = 0;
     this.touchCurrentY = 0;
     this.isTouching = false;
+    this.velocitySetToZero = false;
   }
 
   create() {
@@ -33,9 +34,16 @@ class GameScene extends Phaser.Scene {
     if (this.isMobile) {
       this.setupTouchControls();
     }
+    this.scale.removeAllListeners();
   }
 
   setupTouchControls() {
+    if (this.touchHandlersAdded) {
+      this.input.off("pointerdown");
+      this.input.off("pointermove");
+      this.input.off("pointerup");
+    }
+
     this.input.on("pointerdown", (pointer) => {
       this.isTouching = true;
       this.touchStartX = pointer.x;
@@ -48,6 +56,8 @@ class GameScene extends Phaser.Scene {
       if (this.isTouching) {
         this.touchCurrentX = pointer.x;
         this.touchCurrentY = pointer.y;
+
+        this.handleTouchInputDirect();
       }
     });
 
@@ -55,11 +65,24 @@ class GameScene extends Phaser.Scene {
       this.isTouching = false;
       this.touchCurrentX = pointer.x;
       this.touchCurrentY = pointer.y;
+
+      this.velocitySetToZero = false;
     });
 
-    const { width, height } = this.scale;
+    this.touchHandlersAdded = true;
+
+    const width = this.game.config.width;
+    const height = this.game.config.height;
+
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const safeAreaBottom = isIOS ? 34 : 0;
+    const safeAreaRight = isIOS ? 20 : 20;
+
+    const buttonX = width - 80 - safeAreaRight;
+    const buttonY = height - 80 - safeAreaBottom;
+
     this.fireButton = this.add
-      .circle(width - 80, height - 80, 50, 0xffa000, 0.7)
+      .circle(buttonX, buttonY, 50, 0xffa000, 0.7)
       .setInteractive()
       .on("pointerdown", () => {
         this.isFiring = true;
@@ -73,22 +96,44 @@ class GameScene extends Phaser.Scene {
         this.isFiring = false;
       });
 
-    this.add.circle(width - 80, height - 80, 25, 0xffffff, 0.9);
+    this.add.circle(buttonX, buttonY, 25, 0xffffff, 0.9);
+  }
+
+  handleTouchInputDirect() {
+    if (this.isTouching && this.isMobile && this.player) {
+      this.player.x = this.touchCurrentX;
+      this.player.y = this.touchCurrentY;
+
+      if (!this.velocitySetToZero) {
+        this.player.body.setVelocity(0);
+        this.velocitySetToZero = true;
+      }
+    }
   }
 
   handleTouchInput() {
     if (this.isTouching && this.isMobile) {
-      const deltaX = this.touchCurrentX - this.touchStartX;
-      const deltaY = this.touchCurrentY - this.touchStartY;
-      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const targetX = this.touchCurrentX;
+      const targetY = this.touchCurrentY;
 
-      if (distance > 10) {
-        const speed = Math.min(distance / 100, 1) * this.player.velocity;
-        const angle = Math.atan2(deltaY, deltaX);
+      const deltaX = Math.abs(targetX - this.lastTouchX);
+      const deltaY = Math.abs(targetY - this.lastTouchY);
 
-        this.player.body.setVelocityX(Math.cos(angle) * speed);
-        this.player.body.setVelocityY(Math.sin(angle) * speed);
+      if (deltaX > 2 || deltaY > 2) {
+        const lerpFactor = 0.7;
+        this.player.x = Phaser.Math.Linear(this.player.x, targetX, lerpFactor);
+        this.player.y = Phaser.Math.Linear(this.player.y, targetY, lerpFactor);
+
+        this.lastTouchX = targetX;
+        this.lastTouchY = targetY;
       }
+
+      if (!this.velocitySetToZero) {
+        this.player.body.setVelocity(0);
+        this.velocitySetToZero = true;
+      }
+    } else if (!this.isTouching && this.isMobile) {
+      this.velocitySetToZero = false;
     }
   }
 
@@ -103,7 +148,9 @@ class GameScene extends Phaser.Scene {
   createText() {
     this.scoreText = this.add.text(50, 50, "Score: 0", {
       font: "40px CurseCasual",
-      fill: "#FFFFFF",
+      fill: "#ffa000",
+      antialias: true,
+      resolution: window.devicePixelRatio || 1,
     });
   }
 
@@ -143,6 +190,10 @@ class GameScene extends Phaser.Scene {
     });
   }
 
+  destroy() {
+    super.destroy();
+  }
+
   onOverlap(source, target) {
     const enemy = [source, target].find((item) => item.texture.key === "ship");
 
@@ -157,17 +208,15 @@ class GameScene extends Phaser.Scene {
   }
 
   update() {
-    this.player.move();
+    if (this.player) {
+      this.player.move();
+    }
 
-    if (!this.isMobile) {
+    if (!this.isMobile && this.bg && this.time.now % 2 === 0) {
       this.bg.tilePositionX += 0.5;
     }
 
-    if (this.isMobile) {
-      this.handleTouchInput();
-    }
-
-    if (this.isFiring) {
+    if (this.isFiring && this.player) {
       const time = this.time.now;
       if (time > this.player.lastFired + this.player.fireDelay) {
         this.player.fire();
@@ -180,15 +229,18 @@ class GameScene extends Phaser.Scene {
     if (this.isMobile) {
       this.bg = this.add.image(0, 0, "bgp").setOrigin(0);
 
-      const scaleX = this.scale.width / this.bg.width;
-      const scaleY = this.scale.height / this.bg.height;
+      const gameWidth = this.game.config.width;
+      const gameHeight = this.game.config.height;
+
+      const scaleX = gameWidth / this.bg.width;
+      const scaleY = gameHeight / this.bg.height;
       const scale = Math.max(scaleX, scaleY);
 
       this.bg.setScale(scale);
 
       this.bg.setPosition(
-        (this.scale.width - this.bg.displayWidth) / 2,
-        (this.scale.height - this.bg.displayHeight) / 2
+        (gameWidth - this.bg.displayWidth) / 2,
+        (gameHeight - this.bg.displayHeight) / 2
       );
     } else {
       this.bg = this.add

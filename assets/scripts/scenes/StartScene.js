@@ -17,21 +17,25 @@ class StartScene extends Phaser.Scene {
     }
     this.createText();
     this.setEvents();
+    this.scale.removeAllListeners();
   }
 
   createBackground() {
     if (this.isMobile) {
       this.bg = this.add.image(0, 0, "bgp").setOrigin(0);
 
-      const scaleX = this.scale.width / this.bg.width;
-      const scaleY = this.scale.height / this.bg.height;
+      const gameWidth = this.game.config.width;
+      const gameHeight = this.game.config.height;
+
+      const scaleX = gameWidth / this.bg.width;
+      const scaleY = gameHeight / this.bg.height;
       const scale = Math.max(scaleX, scaleY);
 
       this.bg.setScale(scale);
 
       this.bg.setPosition(
-        (this.scale.width - this.bg.displayWidth) / 2,
-        (this.scale.height - this.bg.displayHeight) / 2
+        (gameWidth - this.bg.displayWidth) / 2,
+        (gameHeight - this.bg.displayHeight) / 2
       );
     } else {
       this.add.sprite(0, 0, "bg").setOrigin(0);
@@ -39,12 +43,14 @@ class StartScene extends Phaser.Scene {
   }
 
   createText() {
-    const centerX = this.isMobile ? this.scale.width / 2 : config.width / 2;
-    const centerY = this.isMobile ? this.scale.height / 2 : config.height / 2;
+    const gameWidth = this.game.config.width;
+    const gameHeight = this.game.config.height;
+    const centerX = this.isMobile ? gameWidth / 2 : config.width / 2;
+    const centerY = this.isMobile ? gameHeight / 2 : config.height / 2;
 
     if (!this.gameEnded) {
-      const rectWidth = this.isMobile ? this.scale.width * 0.9 : 700;
-      const rectHeight = this.isMobile ? this.scale.height * 0.7 : 500;
+      const rectWidth = this.isMobile ? gameWidth * 0.9 : 700;
+      const rectHeight = this.isMobile ? gameHeight * 0.7 : 500;
 
       this.add
         .graphics()
@@ -103,10 +109,12 @@ class StartScene extends Phaser.Scene {
   }
 
   createStats(data) {
-    const centerX = this.isMobile ? this.scale.width / 2 : config.width / 2;
-    const centerY = this.isMobile ? this.scale.height / 2 : config.height / 2;
-    const rectWidth = this.isMobile ? this.scale.width * 0.8 : 600;
-    const rectHeight = this.isMobile ? this.scale.height * 0.6 : 600;
+    const gameWidth = this.game.config.width;
+    const gameHeight = this.game.config.height;
+    const centerX = this.isMobile ? gameWidth / 2 : config.width / 2;
+    const centerY = this.isMobile ? gameHeight / 2 : config.height / 2;
+    const rectWidth = this.isMobile ? gameWidth * 0.8 : 600;
+    const rectHeight = this.isMobile ? gameHeight * 0.6 : 600;
 
     this.add
       .graphics()
