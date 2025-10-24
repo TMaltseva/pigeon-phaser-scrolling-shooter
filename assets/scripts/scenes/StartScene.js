@@ -46,7 +46,12 @@ class StartScene extends Phaser.Scene {
     const gameWidth = this.game.config.width;
     const gameHeight = this.game.config.height;
     const centerX = this.isMobile ? gameWidth / 2 : config.width / 2;
-    const centerY = this.isMobile ? gameHeight / 2 : config.height / 2;
+
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const iosOffset = isIOS ? -60 : 0;
+    const centerY = this.isMobile
+      ? gameHeight / 2 + iosOffset
+      : config.height / 2;
 
     if (!this.gameEnded) {
       const rectWidth = this.isMobile ? gameWidth * 0.9 : 700;
@@ -112,7 +117,12 @@ class StartScene extends Phaser.Scene {
     const gameWidth = this.game.config.width;
     const gameHeight = this.game.config.height;
     const centerX = this.isMobile ? gameWidth / 2 : config.width / 2;
-    const centerY = this.isMobile ? gameHeight / 2 : config.height / 2;
+
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const iosOffset = isIOS ? -60 : 0;
+    const centerY = this.isMobile
+      ? gameHeight / 2 + iosOffset
+      : config.height / 2;
     const rectWidth = this.isMobile ? gameWidth * 0.8 : 600;
     const rectHeight = this.isMobile ? gameHeight * 0.6 : 600;
 

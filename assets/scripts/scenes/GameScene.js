@@ -77,9 +77,10 @@ class GameScene extends Phaser.Scene {
     const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
     const safeAreaBottom = isIOS ? 34 : 0;
     const safeAreaRight = isIOS ? 20 : 20;
+    const iosOffset = isIOS ? -30 : 0;
 
     const buttonX = width - 80 - safeAreaRight;
-    const buttonY = height - 80 - safeAreaBottom;
+    const buttonY = height - 80 - safeAreaBottom + iosOffset;
 
     this.fireButton = this.add
       .circle(buttonX, buttonY, 50, 0xffa000, 0.7)
@@ -146,7 +147,11 @@ class GameScene extends Phaser.Scene {
   }
 
   createText() {
-    this.scoreText = this.add.text(50, 50, "Score: 0", {
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const iosOffset = isIOS ? -30 : 0;
+    const textY = this.isMobile ? 50 + iosOffset : 50;
+
+    this.scoreText = this.add.text(50, textY, "Score: 0", {
       font: "40px CurseCasual",
       fill: "#ffa000",
       antialias: true,
