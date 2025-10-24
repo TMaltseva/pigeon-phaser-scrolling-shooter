@@ -5,7 +5,7 @@ class PreloadScene extends Phaser.Scene {
 
   preload() {
     this.add.sprite(0, 0, "bg").setOrigin(0);
-
+    this.add.sprite(0, 0, "bgp").setOrigin(0);
     const loadingBar = new LoadingBar(this);
     this.preloadAssets();
   }

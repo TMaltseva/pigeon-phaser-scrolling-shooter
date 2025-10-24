@@ -59,9 +59,9 @@ class Player extends MovableObject {
   }
 
   move() {
-    this.body.setVelocity(0);
-    if (this.scene.joystick) {
-    } else {
+    if (!this.scene.isMobile) {
+      this.body.setVelocity(0);
+
       if (this.scene.cursors.left.isDown) {
         this.body.setVelocityX(-this.velocity);
       } else if (this.scene.cursors.right.isDown) {
